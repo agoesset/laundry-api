@@ -23,11 +23,21 @@ Route::prefix('v1')->group(function () {
     
     // Public routes - tidak memerlukan authentication
     Route::prefix('auth')->group(function () {
-        // Route akan ditambahkan pada step selanjutnya
+        Route::post('login', [App\Http\Controllers\Api\AuthController::class, 'login']);
+        Route::post('register', [App\Http\Controllers\Api\AuthController::class, 'register']);
+        Route::post('check-email', [App\Http\Controllers\Api\AuthController::class, 'checkEmail']);
     });
     
     // Protected routes - memerlukan authentication
     Route::middleware('auth:sanctum')->group(function () {
+        
+        // Auth routes yang memerlukan authentication
+        Route::prefix('auth')->group(function () {
+            Route::post('logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
+            Route::post('logout-all', [App\Http\Controllers\Api\AuthController::class, 'logoutAll']);
+            Route::get('profile', [App\Http\Controllers\Api\AuthController::class, 'profile']);
+            Route::put('update-password', [App\Http\Controllers\Api\AuthController::class, 'updatePassword']);
+        });
         
         // User profile routes
         Route::prefix('profile')->group(function () {
