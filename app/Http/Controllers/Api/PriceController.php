@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PriceStoreRequest;
 use App\Models\Price;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -69,36 +70,10 @@ class PriceController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(PriceStoreRequest $request): JsonResponse
     {
-        // Check permission - hanya admin
-        if (!$request->user()->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Hanya admin yang bisa menambah harga',
-            ], 403);
-        }
-        
-        // Validasi input
-        $validated = $request->validate([
-            'jenis' => 'required|string|max:255',
-            'kg' => 'required|string|max:50',
-            'harga' => 'required|numeric|min:0|max:1000000',
-            'hari' => 'required|integer|min:1|max:30',
-            'status' => 'required|in:Active,Inactive',
-        ]);
-        
-        // Check duplicate jenis
-        $exists = Price::where('jenis', $validated['jenis'])
-                      ->where('status', 'Active')
-                      ->exists();
-                      
-        if ($exists) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Jenis layanan dengan nama tersebut sudah ada',
-            ], 422);
-        }
+        // Validasi otomatis handled oleh PriceStoreRequest
+        $validated = $request->validated();
         
         DB::beginTransaction();
         try {

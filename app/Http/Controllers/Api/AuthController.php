@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AuthLoginRequest;
+use App\Http\Requests\AuthRegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -24,14 +26,9 @@ class AuthController extends Controller
      * @return JsonResponse
      * @throws ValidationException
      */
-    public function login(Request $request): JsonResponse
+    public function login(AuthLoginRequest $request): JsonResponse
     {
-        // Validasi input
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string|min:6',
-            'device_name' => 'required|string', // Nama device untuk token
-        ]);
+        // Validasi otomatis handled oleh AuthLoginRequest
 
         // Cari user berdasarkan email
         $user = User::where('email', $request->email)->first();
@@ -83,17 +80,9 @@ class AuthController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function register(Request $request): JsonResponse
+    public function register(AuthRegisterRequest $request): JsonResponse
     {
-        // Validasi input
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed', // password_confirmation
-            'no_telp' => 'required|string|max:20',
-            'alamat' => 'required|string',
-            'device_name' => 'required|string',
-        ]);
+        // Validasi otomatis handled oleh AuthRegisterRequest
 
         // Buat user baru dengan role Customer
         $user = User::create([

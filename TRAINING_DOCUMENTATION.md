@@ -523,15 +523,109 @@ PUT    /api/v1/customers/{id}/status
 
 ### 🛡️ **PHASE 5: SECURITY & VALIDATION**
 
-#### ⏳ **Step 11: Request Validation**
-**Status:** Pending  
-**Estimasi:** 30 menit  
+#### ✅ **Step 9: Implementasi Validation dan Error Handling**
+**Tanggal:** 2025-06-26  
+**Durasi:** 40 menit  
+**Status:** Completed  
 
-**Yang Akan Dilakukan:**
-- Buat Form Request classes
-- Implementasi custom validation rules
-- Setup error handling yang konsisten
+**Yang Dilakukan:**
+- Membuat Form Request classes untuk validasi input yang konsisten
+- Implementasi custom validation rules dengan business logic
+- Setup error handling global untuk API responses
 - Buat validation messages dalam bahasa Indonesia
+- Update controllers untuk menggunakan Form Requests
+
+**File Form Request yang Dibuat:**
+- `app/Http/Requests/AuthLoginRequest.php` - Validasi login dengan custom error messages
+- `app/Http/Requests/AuthRegisterRequest.php` - Validasi registrasi customer
+- `app/Http/Requests/TransactionStoreRequest.php` - Validasi create transaksi dengan business rules
+- `app/Http/Requests/TransactionUpdateRequest.php` - Validasi update transaksi dengan status flow
+- `app/Http/Requests/PriceStoreRequest.php` - Validasi create harga dengan duplicate check
+
+**Features Validation yang Diimplementasi:**
+1. **AuthLoginRequest:**
+   - Email format validation
+   - Password minimum 8 karakter
+   - Device name required untuk token management
+   - Custom error messages dalam bahasa Indonesia
+
+2. **AuthRegisterRequest:**
+   - Validasi lengkap untuk registrasi customer
+   - Password confirmation check
+   - Email uniqueness validation
+   - Required fields: name, email, no_telp, alamat
+
+3. **TransactionStoreRequest:**
+   - Customer role validation (harus Customer)
+   - Price active validation
+   - Minimum order validation dari settings
+   - Diskon maksimal validation
+   - Authorization check (Admin/Karyawan only)
+
+4. **TransactionUpdateRequest:**
+   - Status flow validation (tidak bisa mundur)
+   - Payment status protection (Success tidak bisa diubah)
+   - Business rules validation untuk berat dan diskon
+   - Route parameter validation
+
+5. **PriceStoreRequest:**
+   - Duplicate jenis layanan check
+   - Harga minimum Rp 1,000
+   - Estimasi hari 1-30 hari
+   - Admin authorization
+
+**Global Error Handling yang Diimplementasi:**
+- ValidationException dengan format standar
+- ModelNotFoundException (404)
+- AuthenticationException (401)
+- AuthorizationException (403)
+- QueryException dengan environment-based messages
+- HttpException handling
+- PDOException untuk database connection errors
+- Generic Exception dengan development/production mode
+
+**Error Response Format:**
+```json
+{
+    "success": false,
+    "message": "Pesan error dalam bahasa Indonesia",
+    "errors": {
+        "field": ["Pesan validasi spesifik"]
+    }
+}
+```
+
+**Controllers yang Diupdate:**
+- `AuthController.php` - Menggunakan AuthLoginRequest dan AuthRegisterRequest
+- `TransactionController.php` - Menggunakan TransactionStoreRequest dan TransactionUpdateRequest
+- `PriceController.php` - Menggunakan PriceStoreRequest
+
+**Sample Data yang Dibuat:**
+- `LaundrySettingSeeder.php` - Settings default untuk validation testing
+- Minimum order: Rp 10,000
+- Diskon maksimal: 20%
+- Working days: Senin - Sabtu
+
+**Testing Results:**
+- ✅ Login validation errors working correctly
+- ✅ Register validation with multiple errors
+- ✅ 404 endpoint not found with custom message
+- ✅ Custom error messages dalam bahasa Indonesia
+- ✅ Business logic validation working
+
+**Security Features:**
+- Authorization check di Form Request level
+- Business rules validation dengan database settings
+- Status flow protection untuk data integrity
+- Environment-based error exposure (dev vs production)
+
+**Best Practices Applied:**
+- Detailed PHPDoc comments
+- Consistent error response format
+- Authorization dalam Form Request
+- Custom validation messages
+- Business logic validation
+- Environment-aware error handling
 
 ---
 

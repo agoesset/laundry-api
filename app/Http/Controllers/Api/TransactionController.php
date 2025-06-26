@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TransactionStoreRequest;
+use App\Http\Requests\TransactionUpdateRequest;
 use App\Models\Transaction;
 use App\Models\Price;
 use App\Models\LaundrySetting;
@@ -88,25 +90,12 @@ class TransactionController extends Controller
      * @return JsonResponse
      * @throws ValidationException
      */
-    public function store(Request $request): JsonResponse
+    public function store(TransactionStoreRequest $request): JsonResponse
     {
-        // Validasi input
-        $validated = $request->validate([
-            'customer_id' => 'required|exists:users,id',
-            'price_id' => 'required|exists:prices,id',
-            'kg' => 'required|numeric|min:0.1|max:100',
-            'payment_method' => 'required|in:Cash,Transfer,E-Wallet',
-            'discount' => 'nullable|numeric|min:0',
-        ]);
+        // Validasi otomatis handled oleh TransactionStoreRequest
+        $validated = $request->validated();
         
-        // Check user permission
         $user = $request->user();
-        if (!$user->isAdmin() && !$user->isKaryawan()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda tidak memiliki akses untuk membuat transaksi',
-            ], 403);
-        }
         
         // Get price details
         $price = Price::findOrFail($validated['price_id']);
@@ -230,16 +219,10 @@ class TransactionController extends Controller
      * @param string $id
      * @return JsonResponse
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(TransactionUpdateRequest $request, string $id): JsonResponse
     {
-        // Check permission - hanya admin/karyawan
-        $user = $request->user();
-        if (!$user->isAdmin() && !$user->isKaryawan()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda tidak memiliki akses untuk update transaksi',
-            ], 403);
-        }
+        // Validasi otomatis handled oleh TransactionUpdateRequest
+        $validated = $request->validated();
         
         $transaction = Transaction::find($id);
         
@@ -249,14 +232,6 @@ class TransactionController extends Controller
                 'message' => 'Transaksi tidak ditemukan',
             ], 404);
         }
-        
-        // Validasi input
-        $validated = $request->validate([
-            'status_order' => 'sometimes|in:Process,Done,Delivery',
-            'status_payment' => 'sometimes|in:Pending,Success',
-            'payment_method' => 'sometimes|in:Cash,Transfer,E-Wallet',
-            'tgl_ambil' => 'sometimes|date|after_or_equal:today',
-        ]);
         
         // Validasi business logic
         if (isset($validated['status_order'])) {
