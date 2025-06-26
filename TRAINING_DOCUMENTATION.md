@@ -344,15 +344,85 @@ php artisan make:model LaundrySetting
 
 ---
 
-#### ⏳ **Step 7: Protected Routes & Middleware**
-**Status:** Pending  
-**Estimasi:** 20 menit  
+#### ✅ **Step 7: Buat API Controllers untuk CRUD Operations**
+**Tanggal:** 2025-06-26  
+**Durasi:** 45 menit  
+**Status:** Completed  
 
-**Yang Akan Dilakukan:**
-- Setup sanctum middleware untuk protected routes
-- Buat role-based middleware
-- Konfigurasi CORS untuk Flutter app
-- Setup rate limiting
+**Yang Dilakukan:**
+- Buat TransactionController dengan CRUD lengkap
+- Buat PriceController untuk manajemen harga
+- Buat UserController untuk profile dan customer management
+- Implementasi role-based permissions
+- Tambah business logic dan validations
+
+**File Controller yang Dibuat:**
+- `app/Http/Controllers/Api/TransactionController.php`
+- `app/Http/Controllers/Api/PriceController.php`
+- `app/Http/Controllers/Api/UserController.php`
+
+**Features TransactionController:**
+1. **index()** - List transaksi dengan filter & pagination
+   - Customer hanya lihat transaksi sendiri
+   - Admin/Karyawan lihat semua transaksi
+   - Filter: status_order, status_payment, date range, search
+2. **store()** - Buat transaksi baru (Admin/Karyawan only)
+   - Validasi minimum order dari settings
+   - Validasi discount maksimal
+   - Auto-generate invoice number
+3. **show()** - Detail transaksi dengan permission check
+4. **update()** - Update status transaksi
+   - Status flow validation (tidak bisa mundur)
+   - Auto-update customer points saat Done
+5. **destroy()** - Soft delete (Admin only)
+6. **summary()** - Statistics & reporting
+
+**Features PriceController:**
+1. **index()** - List harga dengan filter active/inactive
+   - Customer hanya lihat yang active
+   - Option group by jenis layanan
+2. **store()** - Tambah harga baru (Admin only)
+   - Check duplicate jenis layanan
+3. **show()** - Detail harga dengan estimasi selesai
+4. **update()** - Update harga (Admin only)
+   - Validasi jika sudah digunakan di transaksi
+5. **destroy()** - Delete harga (Admin only)
+   - Prevent delete jika sudah digunakan
+6. **getJenisList()** - List unique jenis layanan
+
+**Features UserController:**
+1. **updateProfile()** - Update profile data user
+2. **updatePhoto()** - Upload foto profile (max 2MB)
+3. **deletePhoto()** - Hapus foto profile
+4. **getCustomers()** - List customer (Admin/Karyawan)
+   - With transaction count
+   - Search & filter
+5. **getCustomerDetail()** - Detail customer dengan transaksi
+6. **createCustomer()** - Buat customer baru (Admin/Karyawan)
+7. **updateCustomerStatus()** - Active/Inactive (Admin only)
+8. **getPointsHistory()** - History points customer
+
+**Business Logic yang Diimplementasi:**
+- Permission checking per role (Admin, Karyawan, Customer)
+- Status flow validation untuk transaksi
+- Points calculation: 1 point per Rp 10.000
+- Minimum order validation dari settings
+- Discount validation dengan max percentage
+- File upload handling untuk foto profile
+- Soft delete protection untuk data integrity
+
+**Security Practices:**
+- Role-based access control
+- Transaction wrapping dengan DB::beginTransaction()
+- File validation untuk upload
+- Prevent delete data yang sudah digunakan
+- Permission check di setiap method
+
+**Response Consistency:**
+- Semua response menggunakan format standar
+- Success/error messages dalam bahasa Indonesia
+- Proper HTTP status codes
+- Detailed validation messages
 
 ---
 
