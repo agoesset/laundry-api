@@ -41,22 +41,38 @@ Route::prefix('v1')->group(function () {
         
         // User profile routes
         Route::prefix('profile')->group(function () {
-            // Route akan ditambahkan pada step selanjutnya
+            Route::put('update', [App\Http\Controllers\Api\UserController::class, 'updateProfile']);
+            Route::post('photo', [App\Http\Controllers\Api\UserController::class, 'updatePhoto']);
+            Route::delete('photo', [App\Http\Controllers\Api\UserController::class, 'deletePhoto']);
+            Route::get('points-history', [App\Http\Controllers\Api\UserController::class, 'getPointsHistory']);
         });
         
         // Transaction routes
         Route::prefix('transactions')->group(function () {
-            // Route akan ditambahkan pada step selanjutnya
+            Route::get('/', [App\Http\Controllers\Api\TransactionController::class, 'index']);
+            Route::post('/', [App\Http\Controllers\Api\TransactionController::class, 'store']);
+            Route::get('summary', [App\Http\Controllers\Api\TransactionController::class, 'summary']);
+            Route::get('{id}', [App\Http\Controllers\Api\TransactionController::class, 'show']);
+            Route::put('{id}', [App\Http\Controllers\Api\TransactionController::class, 'update']);
+            Route::delete('{id}', [App\Http\Controllers\Api\TransactionController::class, 'destroy']);
         });
         
-        // Price routes (admin only)
+        // Price routes
         Route::prefix('prices')->group(function () {
-            // Route akan ditambahkan pada step selanjutnya
+            Route::get('/', [App\Http\Controllers\Api\PriceController::class, 'index']);
+            Route::get('jenis-list', [App\Http\Controllers\Api\PriceController::class, 'getJenisList']);
+            Route::post('/', [App\Http\Controllers\Api\PriceController::class, 'store']);
+            Route::get('{id}', [App\Http\Controllers\Api\PriceController::class, 'show']);
+            Route::put('{id}', [App\Http\Controllers\Api\PriceController::class, 'update']);
+            Route::delete('{id}', [App\Http\Controllers\Api\PriceController::class, 'destroy']);
         });
         
-        // Customer routes (admin only)
+        // Customer routes (for admin/karyawan)
         Route::prefix('customers')->group(function () {
-            // Route akan ditambahkan pada step selanjutnya
+            Route::get('/', [App\Http\Controllers\Api\UserController::class, 'getCustomers']);
+            Route::post('/', [App\Http\Controllers\Api\UserController::class, 'createCustomer']);
+            Route::get('{id}', [App\Http\Controllers\Api\UserController::class, 'getCustomerDetail']);
+            Route::put('{id}/status', [App\Http\Controllers\Api\UserController::class, 'updateCustomerStatus']);
         });
         
     });

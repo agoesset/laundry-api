@@ -428,39 +428,96 @@ php artisan make:model LaundrySetting
 
 ### 📊 **PHASE 4: CORE API ENDPOINTS**
 
-#### ⏳ **Step 8: Transaction API Controller**
-**Status:** Pending  
-**Estimasi:** 45 menit  
+#### ✅ **Step 8: Setup API Routes dan Middleware**
+**Tanggal:** 2025-06-26  
+**Durasi:** 20 menit  
+**Status:** Completed  
 
-**Yang Akan Dilakukan:**
-- Buat TransactionController dengan CRUD operations
-- Implementasi validation rules
-- Setup authorization untuk user roles
-- Buat API Resources untuk response formatting
+**Yang Dilakukan:**
+- Setup semua API routes untuk controllers yang sudah dibuat
+- Konfigurasi route groups dengan authentication middleware
+- Buat sample data (PriceSeeder) untuk testing
+- Test endpoints dengan curl untuk validasi
+- Update rate limiting configuration
 
----
+**Routes yang Dibuat:**
 
-#### ⏳ **Step 9: Price Management API**
-**Status:** Pending  
-**Estimasi:** 30 menit  
+**1. Public Routes (no auth required):**
+```
+POST /api/v1/auth/login
+POST /api/v1/auth/register  
+POST /api/v1/auth/check-email
+```
 
-**Yang Akan Dilakukan:**
-- Buat PriceController untuk admin
-- Implementasi CRUD untuk harga layanan
-- Setup validation dan authorization
-- Buat resource responses
+**2. Protected Routes (auth:sanctum required):**
 
----
+**Authentication Routes:**
+```
+POST /api/v1/auth/logout
+POST /api/v1/auth/logout-all
+GET  /api/v1/auth/profile
+PUT  /api/v1/auth/update-password
+```
 
-#### ⏳ **Step 10: User Profile API**
-**Status:** Pending  
-**Estimasi:** 25 menit  
+**Profile Routes:**
+```
+PUT    /api/v1/profile/update
+POST   /api/v1/profile/photo
+DELETE /api/v1/profile/photo
+GET    /api/v1/profile/points-history
+```
 
-**Yang Akan Dilakukan:**
-- Buat UserController untuk profile management
-- Implementasi update profile
-- Setup file upload untuk foto profile
-- Buat customer list untuk admin
+**Transaction Routes:**
+```
+GET    /api/v1/transactions
+POST   /api/v1/transactions
+GET    /api/v1/transactions/summary
+GET    /api/v1/transactions/{id}
+PUT    /api/v1/transactions/{id}
+DELETE /api/v1/transactions/{id}
+```
+
+**Price Routes:**
+```
+GET    /api/v1/prices
+GET    /api/v1/prices/jenis-list
+POST   /api/v1/prices
+GET    /api/v1/prices/{id}
+PUT    /api/v1/prices/{id}
+DELETE /api/v1/prices/{id}
+```
+
+**Customer Routes:**
+```
+GET    /api/v1/customers
+POST   /api/v1/customers
+GET    /api/v1/customers/{id}
+PUT    /api/v1/customers/{id}/status
+```
+
+**Sample Data yang Dibuat:**
+- 5 jenis layanan laundry (Cuci Kering, Cuci Setrika, dll)
+- Harga mulai dari Rp 5.000 - Rp 15.000 per kg
+- Estimasi pengerjaan 1-3 hari
+
+**API Testing:**
+- Login authentication: ✅ Working
+- Get prices endpoint: ✅ Working  
+- Get transactions (empty): ✅ Working
+- Token-based authentication: ✅ Working
+- Rate limiting: ✅ Configured
+
+**Route Protection:**
+- Semua CRUD operations memerlukan authentication
+- Role-based permissions di-handle di controller level
+- Customer hanya bisa akses data mereka sendiri
+- Admin/Karyawan bisa akses semua data
+
+**Middleware Stack:**
+- Laravel Sanctum untuk token authentication
+- Rate limiting (60 req/min per user)
+- CORS untuk cross-origin requests
+- Throttling untuk security
 
 ---
 
