@@ -194,16 +194,76 @@ php artisan migrate:fresh
 
 ---
 
-#### ⏳ **Step 5: Model Creation & Relationships**
-**Status:** Pending  
-**Estimasi:** 25 menit  
+#### ✅ **Step 5: Model Creation & Relationships**
+**Tanggal:** 2025-06-26  
+**Durasi:** 25 menit  
+**Status:** Completed  
 
-**Yang Akan Dilakukan:**
-- Buat model User dengan HasApiTokens trait
-- Buat model Transaction dengan relationships
-- Buat model Price dengan relationships
-- Buat model DataBank dengan relationships
-- Setup proper fillable dan hidden attributes
+**Yang Dilakukan:**
+- Update model User dengan HasApiTokens trait dan relationships lengkap
+- Buat model Price dengan relationship ke User dan Transaction
+- Buat model Transaction dengan relationships dan helper methods
+- Buat model BankAccount dengan logic primary account
+- Buat model LaundrySetting dengan pengaturan operasional
+
+**File Model yang Dibuat/Diupdate:**
+- `app/Models/User.php` - Tambah HasApiTokens, relationships, scopes, dan helper methods
+- `app/Models/Price.php` - Model harga layanan dengan format rupiah
+- `app/Models/Transaction.php` - Model transaksi dengan auto-generate invoice
+- `app/Models/BankAccount.php` - Model rekening bank dengan masked number
+- `app/Models/LaundrySetting.php` - Model pengaturan dengan working days logic
+
+**Fitur Model yang Diimplementasi:**
+1. **User Model:**
+   - Laravel Sanctum integration dengan HasApiTokens
+   - Relationships: prices, transactions, bankAccounts, laundrySettings
+   - Scopes: byRole(), active()
+   - Helper methods: isAdmin(), isCustomer(), isKaryawan()
+   - Accessor: getFotoUrlAttribute()
+
+2. **Price Model:**
+   - Relationship dengan User dan Transaction
+   - Type casting untuk decimal harga
+   - Scopes: active(), byJenis(), orderByPrice()
+   - Helper: getFormattedHargaAttribute() untuk format rupiah
+   - Helper: getEstimasiSelesai() untuk tanggal selesai
+
+3. **Transaction Model:**
+   - Auto-generate invoice dengan format LND-YYYYMMDD-0001
+   - Relationships: customer, user, price
+   - Multiple scopes untuk filtering
+   - Boot method untuk auto-fill fields
+   - Accessor untuk status text Indonesia
+
+4. **BankAccount Model:**
+   - Auto-manage primary account (hanya 1 per user)
+   - Masked account number untuk security
+   - Scopes: active(), primary(), byBank()
+   - Boot method untuk validasi primary
+
+5. **LaundrySetting Model:**
+   - JSON field untuk working_days
+   - Hidden fields untuk API tokens
+   - Helper: isOpen() check jam operasional
+   - Helper: invoice number management
+   - Boot method untuk single active setting
+
+**Best Practices yang Diterapkan:**
+- Detailed PHPDoc comments untuk setiap method
+- Type hinting untuk relationships dan return values
+- Proper fillable dan hidden attributes
+- Scopes untuk reusable queries
+- Helper methods untuk business logic
+- Boot methods untuk auto-fill dan validation
+- Accessor pattern untuk computed attributes
+
+**Commands yang Dijalankan:**
+```bash
+php artisan make:model Price
+php artisan make:model Transaction
+php artisan make:model BankAccount
+php artisan make:model LaundrySetting
+```
 
 ---
 
