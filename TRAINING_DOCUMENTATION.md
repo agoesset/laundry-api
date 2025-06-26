@@ -98,21 +98,49 @@ Setelah mengikuti training ini, peserta akan mampu:
 
 ### 🔧 **PHASE 2: PROJECT CONFIGURATION**
 
-#### ⏳ **Step 3: Setup Laravel Sanctum** 
-**Status:** Pending  
-**Estimasi:** 20 menit  
+#### ✅ **Step 3: Setup Laravel Sanctum** 
+**Tanggal:** 2025-06-26  
+**Durasi:** 20 menit  
+**Status:** Completed  
 
-**Yang Akan Dilakukan:**
-- Install Laravel Sanctum package
-- Publish Sanctum configuration
-- Setup database migration untuk personal access tokens
-- Konfigurasi middleware dan guards
+**Yang Dilakukan:**
+- Install Laravel Sanctum package versi ^4.1
+- Publish Sanctum configuration dan migration files
+- Setup API guards di config/auth.php
+- Konfigurasi middleware untuk API authentication
+- Setup API routing dan struktur dasar
 
-**File yang Akan Dimodifikasi:**
-- `composer.json` - Tambah sanctum dependency
-- `config/sanctum.php` - Konfigurasi sanctum
-- `config/auth.php` - Setup guards untuk API
-- `app/Http/Kernel.php` - Register sanctum middleware
+**File yang Dimodifikasi:**
+- `composer.json` - Tambah laravel/sanctum ^4.1 dependency
+- `config/sanctum.php` - Konfigurasi stateful domains dan token expiration
+- `config/auth.php` - Tambah sanctum guard untuk API authentication  
+- `bootstrap/app.php` - Aktifkan API routing dan middleware sanctum
+- `routes/api.php` - Setup struktur route API dengan versioning
+
+**Konfigurasi Penting:**
+- Token expiration: 24 jam (1440 menit)
+- Stateful domains: termasuk 10.0.2.2:8000 untuk Android emulator
+- API throttling: menggunakan throttle middleware
+- Route versioning: `/api/v1/` prefix untuk semua endpoints
+
+**Commands yang Dijalankan:**
+```bash
+composer require laravel/sanctum
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+```
+
+**Commit Message:**
+```
+feat: Setup Laravel Sanctum untuk API authentication
+
+- Install Laravel Sanctum ^4.1 untuk Laravel 12
+- Publish config sanctum.php dan migration files
+- Tambah sanctum guard di config/auth.php
+- Aktifkan API routing dengan middleware sanctum
+- Setup route structure dengan versioning /api/v1/
+- Konfigurasi token expiration 24 jam
+- Tambah support untuk Android emulator (10.0.2.2:8000)
+```
 
 ---
 
