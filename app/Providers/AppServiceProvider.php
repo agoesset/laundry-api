@@ -6,6 +6,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
@@ -27,6 +28,11 @@ class AppServiceProvider extends ServiceProvider
     {
         // Configure API rate limiting
         $this->configureRateLimiting();
+        
+        // Allow API docs access in production
+        Gate::define('viewApiDocs', function () {
+            return true; // Allow all users to view API docs
+        });
         
         // Configure Scramble authentication
         Scramble::configure()

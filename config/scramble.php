@@ -90,7 +90,7 @@ return [
      * ```
      */
     'servers' => [
-        'Development' => 'http://localhost:8000/api',
+        'Production' => 'https://laundry-api.aguss.id/api',
     ],
 
     /**

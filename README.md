@@ -61,9 +61,123 @@ php artisan migrate --seed
 php artisan serve
 ```
 
+## 🚀 Production Deployment
+
+### Nginx Configuration
+File konfigurasi Nginx untuk production deployment:
+
+```nginx
+# HTTP - Redirect to HTTPS
+server {
+    listen 80;
+    server_name laundry-api.aguss.id;
+    return 301 https://$server_name$request_uri;
+}
+
+# HTTPS Configuration
+server {
+    listen 443 ssl http2;
+    server_name laundry-api.aguss.id;
+    root /var/www/html/laundry-api/public;
+
+    # SSL Configuration
+    ssl_certificate /etc/letsencrypt/live/laundry-api.aguss.id/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/laundry-api.aguss.id/privkey.pem;
+    
+    # SSL Security Settings
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+    # Security Headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    index index.php;
+    charset utf-8;
+
+    # Main location block
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # PHP-FPM configuration
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_pass unix:/var/run/php/php8.4-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param HTTPS on;
+        include fastcgi_params;
+    }
+
+    # Deny access to hidden files
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}
+```
+
+### Environment Configuration
+Untuk production, pastikan setting berikut di `.env`:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://laundry-api.aguss.id
+
+# Database production settings
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=db_laundry_api
+DB_USERNAME=your_db_user
+DB_PASSWORD=your_secure_password
+```
+
+### Scramble Configuration
+File `config/scramble.php` telah dikonfigurasi untuk production:
+
+```php
+'servers' => [
+    'Production' => 'https://laundry-api.aguss.id/api',
+],
+```
+
+Gate access untuk API docs di production:
+```php
+// In AppServiceProvider
+Gate::define('viewApiDocs', function () {
+    return true; // Allow all users to view API docs
+});
+```
+
+### Deployment Commands
+```bash
+# Cache configurations
+php artisan config:cache
+php artisan route:cache
+
+# Set proper permissions
+sudo chown -R www-data:www-data storage bootstrap/cache
+sudo chmod -R 775 storage bootstrap/cache
+
+# Restart services
+sudo systemctl reload nginx
+sudo systemctl restart php8.4-fpm
+```
+
 ## 📖 API Documentation
 
+### Development:
 API documentation tersedia di: http://localhost:8000/docs/api
+
+### Production:
+API documentation tersedia di: https://laundry-api.aguss.id/docs/api
+
+**Note**: Dokumentasi menggunakan Scramble dan dapat diakses di environment production dengan gate access yang telah dikonfigurasi.
 
 ### Default Users (dari Seeder):
 - **Admin**: `admin@laundry.com` / `password123`
@@ -84,6 +198,7 @@ php artisan test
 
 ### Manual Testing dengan cURL:
 
+#### Development:
 1. Login:
 ```bash
 curl -X POST http://localhost:8000/api/v1/auth/login \
@@ -94,6 +209,20 @@ curl -X POST http://localhost:8000/api/v1/auth/login \
 2. Use Token:
 ```bash
 curl -X GET http://localhost:8000/api/v1/auth/profile \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+#### Production:
+1. Login:
+```bash
+curl -X POST https://laundry-api.aguss.id/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@laundry.com","password":"password123","device_name":"test"}'
+```
+
+2. Use Token:
+```bash
+curl -X GET https://laundry-api.aguss.id/api/v1/auth/profile \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
