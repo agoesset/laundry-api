@@ -1,61 +1,185 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laundry API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API untuk aplikasi mobile laundry menggunakan Laravel 12 dan Laravel Sanctum.
 
-## About Laravel
+## 📋 Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Authentication** dengan Laravel Sanctum (Personal Access Tokens)
+- **Role-based Access Control** (Admin, Karyawan, Customer)
+- **Transaction Management** dengan status flow validation
+- **Price Management** untuk berbagai jenis layanan
+- **Customer Management** dengan point system
+- **Auto-generated API Documentation** dengan Scramble
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.4+
+- MySQL 8.0+
+- Composer 2.0+
+- Node.js 18+ (optional, untuk frontend assets)
 
-## Learning Laravel
+## 📦 Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Clone repository:
+```bash
+git clone https://github.com/yourusername/laundry-api.git
+cd laundry-api
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+2. Install dependencies:
+```bash
+composer install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. Copy environment file:
+```bash
+cp .env.example .env
+```
 
-## Laravel Sponsors
+4. Generate application key:
+```bash
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+5. Configure database di `.env`:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=db_laundry_api
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-### Premium Partners
+6. Run migrations dan seeders:
+```bash
+php artisan migrate --seed
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+7. Start development server:
+```bash
+php artisan serve
+```
 
-## Contributing
+## 📖 API Documentation
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+API documentation tersedia di: http://localhost:8000/docs/api
 
-## Code of Conduct
+### Default Users (dari Seeder):
+- **Admin**: `admin@laundry.com` / `password123`
+- **Karyawan**: `karyawan@laundry.com` / `password123`
+- **Customer**: `customer@example.com` / `password123`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🧪 Testing
 
-## Security Vulnerabilities
+### Run All Tests:
+```bash
+php artisan test
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Quick API Test:
+```bash
+./test-api.sh
+```
 
-## License
+### Manual Testing dengan cURL:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Login:
+```bash
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@laundry.com","password":"password123","device_name":"test"}'
+```
+
+2. Use Token:
+```bash
+curl -X GET http://localhost:8000/api/v1/auth/profile \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+## 📚 API Endpoints
+
+### Authentication
+- `POST /api/v1/auth/login` - User login
+- `POST /api/v1/auth/register` - Register customer
+- `POST /api/v1/auth/logout` - Logout current session
+- `POST /api/v1/auth/logout-all` - Logout all sessions
+- `GET /api/v1/auth/profile` - Get user profile
+- `PUT /api/v1/auth/update-password` - Update password
+- `POST /api/v1/auth/check-email` - Check email availability
+
+### Prices
+- `GET /api/v1/prices` - Get all active prices
+- `GET /api/v1/prices/{id}` - Get price detail
+- `POST /api/v1/prices` - Create price (Admin/Karyawan)
+- `PUT /api/v1/prices/{id}` - Update price (Admin/Karyawan)
+- `DELETE /api/v1/prices/{id}` - Delete price (Admin/Karyawan)
+- `GET /api/v1/prices/jenis-list` - Get service types
+
+### Transactions
+- `GET /api/v1/transactions` - Get transactions
+- `GET /api/v1/transactions/{id}` - Get transaction detail
+- `POST /api/v1/transactions` - Create transaction (Admin/Karyawan)
+- `PUT /api/v1/transactions/{id}` - Update transaction (Admin/Karyawan)
+- `DELETE /api/v1/transactions/{id}` - Delete transaction (Admin)
+- `GET /api/v1/transactions/summary` - Get summary (Admin/Karyawan)
+
+### Profile & User Management
+- `PUT /api/v1/profile/update` - Update profile
+- `POST /api/v1/profile/photo` - Upload photo
+- `DELETE /api/v1/profile/photo` - Delete photo
+- `GET /api/v1/profile/points-history` - Get points history (Customer)
+- `GET /api/v1/customers` - Get customers (Admin/Karyawan)
+- `POST /api/v1/customers` - Create customer (Admin/Karyawan)
+- `GET /api/v1/customers/{id}` - Get customer detail (Admin/Karyawan)
+- `PUT /api/v1/customers/{id}/status` - Update status (Admin)
+
+## 🛡️ Security
+
+- Authentication menggunakan Laravel Sanctum Personal Access Tokens
+- Role-based access control (Admin, Karyawan, Customer)
+- Request validation dengan Form Requests
+- Rate limiting untuk API endpoints
+- CORS configured untuk mobile apps
+
+## 📱 Flutter Integration
+
+Headers untuk setiap request:
+```dart
+Map<String, String> headers = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json',
+  'Authorization': 'Bearer $token',
+};
+```
+
+## 🔧 Configuration
+
+### Laundry Settings (dari Seeder):
+- **Minimum Order**: Rp 10,000
+- **Max Discount**: 20%
+- **Working Hours**: 08:00 - 20:00
+- **Working Days**: Monday - Saturday
+
+### Available Services:
+1. Cuci Kering - Rp 5,000/kg (1 hari)
+2. Cuci Setrika - Rp 7,000/kg (2 hari)
+3. Cuci Lipat - Rp 6,000/kg (1 hari)
+4. Dry Clean - Rp 15,000/kg (3 hari)
+5. Express - Rp 10,000/kg (1 hari)
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📞 Support
+
+For support, email support@laundry-api.com or create an issue in this repository.

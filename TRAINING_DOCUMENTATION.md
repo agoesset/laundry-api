@@ -738,6 +738,92 @@ PUT    /api/v1/customers/{id}/status
 
 ---
 
+#### ✅ **Step 11: Migration dari Swagger ke Scramble Documentation**
+**Tanggal:** 2025-06-26  
+**Durasi:** 30 menit  
+**Status:** Completed  
+
+**Yang Dilakukan:**
+- Mengganti sistem dokumentasi API dari L5 Swagger ke Scramble
+- Setup Scramble untuk auto-generate dokumentasi dari kode
+- Konfigurasi Scramble dengan pengaturan project yang sesuai
+- Cleaning OpenAPI annotations manual
+
+**Alasan Migrasi ke Scramble:**
+- Auto-generation dokumentasi dari Form Requests dan Controllers
+- Tidak perlu menulis OpenAPI annotations manual
+- Maintenance dokumentasi yang lebih mudah
+- Sinkronisasi otomatis antara kode dan dokumentasi
+- UI yang modern menggunakan Stoplight Elements
+
+**Package yang Diinstall:**
+```bash
+composer remove darkaonline/l5-swagger
+composer require dedoc/scramble
+php artisan vendor:publish --provider="Dedoc\Scramble\ScrambleServiceProvider"
+```
+
+**Konfigurasi Scramble:**
+- File config: `config/scramble.php`
+- API path: `/api`
+- Export path: `api.json`
+- Server URL: `http://localhost:8000/api/v1`
+- UI title: "Laundry API Documentation"
+- Theme: Light
+- Layout: Responsive
+
+**Dokumentasi Endpoints:**
+- **Authentication**: login, register, profile, logout, check-email
+- **Prices**: CRUD operations dengan role-based access
+- **Transactions**: CRUD dengan business logic validation  
+- **Users**: Profile management dan customer operations
+
+**Generated Documentation Access:**
+- **Web UI**: http://localhost:8000/docs/api
+- **JSON Export**: http://localhost:8000/docs/api.json
+- **Manual Export**: `php artisan scramble:export`
+
+**Keunggulan Scramble:**
+1. **Auto-detection**: Otomatis mendeteksi routes, parameters, responses
+2. **Form Request Integration**: Validasi rules otomatis jadi documentation
+3. **Type Inference**: Automatic type detection dari return types
+4. **Modern UI**: Stoplight Elements untuk user experience yang baik
+5. **Zero Configuration**: Minimal setup, works out of the box
+
+**Files yang Dibersihkan:**
+- Removed OpenAPI annotations dari Controllers
+- Deleted `config/l5-swagger.php`
+- Cleaned environment variables
+- Removed manual Swagger documentation files
+
+**Hasil Dokumentasi:**
+- 23 API endpoints otomatis terdokumentasi
+- Request/response schemas ter-generate otomatis
+- Authentication scheme (Bearer token) otomatis terdeteksi
+- Business logic validation rules dalam dokumentasi
+- Mobile-friendly documentation interface
+
+**Benefits untuk Development:**
+- Dokumentasi selalu up-to-date dengan kode
+- Tidak perlu maintain annotations terpisah
+- Auto-generated examples dari Form Requests
+- Better developer experience untuk API consumers
+
+**Fix Session Table Issue:**
+```bash
+# Session table dibutuhkan karena menggunakan SESSION_DRIVER=database
+php artisan session:table
+php artisan migrate
+```
+
+**Verification Steps:**
+- ✅ Web UI accessible: http://localhost:8000/docs/api
+- ✅ JSON export working: http://localhost:8000/docs/api.json
+- ✅ API endpoints functioning normally
+- ✅ Auto-generated documentation includes all 23 endpoints
+
+---
+
 ## 🏆 **CHECKLIST VALIDATION**
 
 ### **Setiap Step Harus Memenuhi:**

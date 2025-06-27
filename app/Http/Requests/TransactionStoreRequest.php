@@ -34,9 +34,8 @@ class TransactionStoreRequest extends FormRequest
         return [
             'customer_id' => 'required|exists:users,id',
             'price_id' => 'required|exists:prices,id',
-            'berat' => 'required|numeric|min:0.1|max:100',
-            'catatan' => 'nullable|string|max:500',
-            'diskon' => 'nullable|numeric|min:0|max:100',
+            'kg' => 'required|numeric|min:0.1|max:100',
+            'discount' => 'nullable|numeric|min:0|max:100',
             'status_order' => 'nullable|in:Process,Done,Delivery',
             'status_payment' => 'nullable|in:Pending,Success,Failed',
         ];
@@ -68,14 +67,14 @@ class TransactionStoreRequest extends FormRequest
             }
 
             // Validasi minimum order dari settings
-            if ($this->berat && $this->price_id) {
+            if ($this->kg && $this->price_id) {
                 $price = Price::find($this->price_id);
                 if ($price) {
-                    $totalHarga = $this->berat * $price->harga;
+                    $totalHarga = $this->kg * $price->harga;
                     $settings = LaundrySetting::first();
                     
                     if ($settings && $totalHarga < $settings->minimum_order) {
-                        $validator->errors()->add('berat', 
+                        $validator->errors()->add('kg', 
                             'Minimum order Rp ' . number_format($settings->minimum_order, 0, ',', '.')
                         );
                     }
@@ -83,10 +82,10 @@ class TransactionStoreRequest extends FormRequest
             }
 
             // Validasi diskon maksimal
-            if ($this->diskon) {
+            if ($this->discount) {
                 $settings = LaundrySetting::where('is_active', true)->first();
-                if ($settings && $this->diskon > $settings->max_discount_percent) {
-                    $validator->errors()->add('diskon', 
+                if ($settings && $this->discount > $settings->max_discount_percent) {
+                    $validator->errors()->add('discount', 
                         'Diskon maksimal ' . $settings->max_discount_percent . '%'
                     );
                 }
@@ -106,14 +105,13 @@ class TransactionStoreRequest extends FormRequest
             'customer_id.exists' => 'Customer tidak ditemukan',
             'price_id.required' => 'Jenis layanan wajib dipilih',
             'price_id.exists' => 'Jenis layanan tidak ditemukan',
-            'berat.required' => 'Berat cucian wajib diisi',
-            'berat.numeric' => 'Berat cucian harus berupa angka',
-            'berat.min' => 'Berat cucian minimal 0.1 kg',
-            'berat.max' => 'Berat cucian maksimal 100 kg',
-            'catatan.max' => 'Catatan maksimal 500 karakter',
-            'diskon.numeric' => 'Diskon harus berupa angka',
-            'diskon.min' => 'Diskon minimal 0%',
-            'diskon.max' => 'Diskon maksimal 100%',
+            'kg.required' => 'Berat cucian wajib diisi',
+            'kg.numeric' => 'Berat cucian harus berupa angka',
+            'kg.min' => 'Berat cucian minimal 0.1 kg',
+            'kg.max' => 'Berat cucian maksimal 100 kg',
+            'discount.numeric' => 'Diskon harus berupa angka',
+            'discount.min' => 'Diskon minimal 0%',
+            'discount.max' => 'Diskon maksimal 100%',
             'status_order.in' => 'Status order tidak valid',
             'status_payment.in' => 'Status payment tidak valid',
         ];
@@ -129,9 +127,8 @@ class TransactionStoreRequest extends FormRequest
         return [
             'customer_id' => 'Customer',
             'price_id' => 'Jenis Layanan',
-            'berat' => 'Berat Cucian',
-            'catatan' => 'Catatan',
-            'diskon' => 'Diskon',
+            'kg' => 'Berat Cucian',
+            'discount' => 'Diskon',
             'status_order' => 'Status Order',
             'status_payment' => 'Status Payment',
         ];

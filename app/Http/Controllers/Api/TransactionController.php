@@ -107,9 +107,10 @@ class TransactionController extends Controller
         
         // Get laundry settings untuk validasi
         $settings = LaundrySetting::getActive();
-        if ($settings && $validated['kg'] < $settings->minimum_order) {
+        $totalHarga = $price->harga * $validated['kg'];
+        if ($settings && $totalHarga < $settings->minimum_order) {
             throw ValidationException::withMessages([
-                'kg' => ["Minimal order adalah {$settings->minimum_order} kg"],
+                'kg' => ['Minimum order Rp ' . number_format($settings->minimum_order, 0, ',', '.')],
             ]);
         }
         
@@ -145,9 +146,8 @@ class TransactionController extends Controller
                 'harga' => $price->harga,
                 'discount' => $discount,
                 'total_harga' => ($price->harga * $validated['kg']) - $discount,
-                'status_order' => 'Process',
-                'status_payment' => 'Pending',
-                'payment_method' => $validated['payment_method'],
+                'status_order' => $validated['status_order'] ?? 'Process',
+                'status_payment' => $validated['status_payment'] ?? 'Pending',
             ]);
             
             // Auto-generate invoice sudah di handle di model
@@ -248,8 +248,9 @@ class TransactionController extends Controller
             }
             
             // Jika status Done/Delivery, payment harus Success
+            $paymentStatus = $validated['status_payment'] ?? $transaction->status_payment;
             if (in_array($validated['status_order'], ['Done', 'Delivery']) && 
-                $transaction->status_payment !== 'Success') {
+                $paymentStatus !== 'Success') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Pembayaran harus lunas sebelum status Done/Delivery',
@@ -358,13 +359,16 @@ class TransactionController extends Controller
     {
         $user = $request->user();
         
+        // Only admin and karyawan can access summary
+        if (!$user->isAdmin() && !$user->isKaryawan()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki akses ke summary transaksi',
+            ], 403);
+        }
+        
         // Base query
         $query = Transaction::query();
-        
-        // Filter untuk customer
-        if ($user->isCustomer()) {
-            $query->where('customer_id', $user->id);
-        }
         
         // Filter periode
         $period = $request->get('period', 'month'); // month, year, all
@@ -379,6 +383,8 @@ class TransactionController extends Controller
         $summary = [
             'total_transactions' => $query->count(),
             'total_revenue' => $query->where('status_payment', 'Success')->sum('total_harga'),
+            'pending_transactions' => (clone $query)->where('status_payment', 'Pending')->count(),
+            'completed_transactions' => (clone $query)->where('status_order', 'Done')->count(),
             'total_kg' => $query->sum('kg'),
             'status_breakdown' => [
                 'process' => (clone $query)->where('status_order', 'Process')->count(),

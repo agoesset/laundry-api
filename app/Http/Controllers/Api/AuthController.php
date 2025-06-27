@@ -20,11 +20,12 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
-     * Login user dan generate token
+     * Login user dan generate token untuk authentication
      * 
-     * @param Request $request
-     * @return JsonResponse
-     * @throws ValidationException
+     * Endpoint untuk login user dengan email, password dan device name.
+     * Akan mengembalikan user data dan authentication token jika berhasil.
+     * 
+     * @unauthenticated
      */
     public function login(AuthLoginRequest $request): JsonResponse
     {
@@ -76,6 +77,8 @@ class AuthController extends Controller
 
     /**
      * Register customer baru
+     * 
+     * @unauthenticated
      * 
      * @param Request $request
      * @return JsonResponse
@@ -155,10 +158,10 @@ class AuthController extends Controller
     }
 
     /**
-     * Get authenticated user profile
+     * Get profile data dari authenticated user
      * 
-     * @param Request $request
-     * @return JsonResponse
+     * Mengembalikan data lengkap user yang sedang login
+     * termasuk informasi bank accounts untuk admin/karyawan.
      */
     public function profile(Request $request): JsonResponse
     {
@@ -235,6 +238,8 @@ class AuthController extends Controller
 
     /**
      * Check email availability untuk registrasi
+     * 
+     * @unauthenticated
      * 
      * @param Request $request
      * @return JsonResponse

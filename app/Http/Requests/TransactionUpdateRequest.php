@@ -32,9 +32,8 @@ class TransactionUpdateRequest extends FormRequest
         return [
             'status_order' => 'sometimes|in:Process,Done,Delivery',
             'status_payment' => 'sometimes|in:Pending,Success,Failed',
-            'catatan' => 'sometimes|string|max:500',
-            'berat' => 'sometimes|numeric|min:0.1|max:100',
-            'diskon' => 'sometimes|numeric|min:0|max:100',
+            'kg' => 'sometimes|numeric|min:0.1|max:100',
+            'discount' => 'sometimes|numeric|min:0|max:100',
         ];
     }
 
@@ -75,22 +74,22 @@ class TransactionUpdateRequest extends FormRequest
             }
 
             // Validasi diskon maksimal jika diubah
-            if ($this->diskon) {
+            if ($this->discount) {
                 $settings = \App\Models\LaundrySetting::where('is_active', true)->first();
-                if ($settings && $this->diskon > $settings->max_discount_percent) {
-                    $validator->errors()->add('diskon', 
+                if ($settings && $this->discount > $settings->max_discount_percent) {
+                    $validator->errors()->add('discount', 
                         'Diskon maksimal ' . $settings->max_discount_percent . '%'
                     );
                 }
             }
 
             // Validasi minimum order jika berat diubah
-            if ($this->berat) {
-                $totalHarga = $this->berat * $transaction->price->harga;
+            if ($this->kg) {
+                $totalHarga = $this->kg * $transaction->price->harga;
                 $settings = \App\Models\LaundrySetting::first();
                 
                 if ($settings && $totalHarga < $settings->minimum_order) {
-                    $validator->errors()->add('berat', 
+                    $validator->errors()->add('kg', 
                         'Minimum order Rp ' . number_format($settings->minimum_order, 0, ',', '.')
                     );
                 }
@@ -108,13 +107,12 @@ class TransactionUpdateRequest extends FormRequest
         return [
             'status_order.in' => 'Status order tidak valid',
             'status_payment.in' => 'Status payment tidak valid',
-            'catatan.max' => 'Catatan maksimal 500 karakter',
-            'berat.numeric' => 'Berat cucian harus berupa angka',
-            'berat.min' => 'Berat cucian minimal 0.1 kg',
-            'berat.max' => 'Berat cucian maksimal 100 kg',
-            'diskon.numeric' => 'Diskon harus berupa angka',
-            'diskon.min' => 'Diskon minimal 0%',
-            'diskon.max' => 'Diskon maksimal 100%',
+            'kg.numeric' => 'Berat cucian harus berupa angka',
+            'kg.min' => 'Berat cucian minimal 0.1 kg',
+            'kg.max' => 'Berat cucian maksimal 100 kg',
+            'discount.numeric' => 'Diskon harus berupa angka',
+            'discount.min' => 'Diskon minimal 0%',
+            'discount.max' => 'Diskon maksimal 100%',
         ];
     }
 
@@ -128,9 +126,8 @@ class TransactionUpdateRequest extends FormRequest
         return [
             'status_order' => 'Status Order',
             'status_payment' => 'Status Payment',
-            'catatan' => 'Catatan',
-            'berat' => 'Berat Cucian',
-            'diskon' => 'Diskon',
+            'kg' => 'Berat Cucian',
+            'discount' => 'Diskon',
         ];
     }
 

@@ -68,11 +68,9 @@ beforeEach(function () {
         'user_id' => $this->adminUser->id,
         'price_id' => $this->price->id,
         'invoice' => 'LND-20250626-0001',
-        'berat' => 3.5,
+        'kg' => 3.5,
         'total_harga' => 17500,
-        'diskon' => 0,
-        'harga_akhir' => 17500,
-        'catatan' => 'Test transaction',
+        'discount' => 0,
         'status_order' => 'Process',
         'status_payment' => 'Pending',
     ]);
@@ -97,8 +95,8 @@ describe('Transaction API', function () {
                     'data' => [
                         'data' => [
                             '*' => [
-                                'id', 'invoice', 'customer', 'user', 'price', 'berat', 
-                                'total_harga', 'diskon', 'harga_akhir', 'catatan',
+                                'id', 'invoice', 'customer', 'user', 'price', 'kg', 
+                                'total_harga', 'discount', 'customer_name', 'customer_email',
                                 'status_order', 'status_payment', 'created_at'
                             ]
                         ]
@@ -138,8 +136,8 @@ describe('Transaction API', function () {
                     'success',
                     'message',
                     'data' => [
-                        'id', 'invoice', 'customer', 'user', 'price', 'berat',
-                        'total_harga', 'diskon', 'harga_akhir', 'catatan',
+                        'id', 'invoice', 'customer', 'user', 'price', 'kg',
+                        'total_harga', 'discount', 'customer_name', 'customer_email',
                         'status_order', 'status_payment', 'created_at'
                     ]
                 ])
@@ -179,9 +177,8 @@ describe('Transaction API', function () {
         $transactionData = [
             'customer_id' => $this->customerUser->id,
             'price_id' => $this->price->id,
-            'berat' => 2.5,
-            'catatan' => 'New test transaction',
-            'diskon' => 10,
+            'kg' => 2.5,
+            'discount' => 10,
             'status_order' => 'Process',
             'status_payment' => 'Pending',
         ];
@@ -195,8 +192,8 @@ describe('Transaction API', function () {
                     'success',
                     'message',
                     'data' => [
-                        'id', 'invoice', 'customer', 'user', 'price', 'berat',
-                        'total_harga', 'diskon', 'harga_akhir', 'catatan',
+                        'id', 'invoice', 'customer', 'user', 'price', 'kg',
+                        'total_harga', 'discount', 'customer_name', 'customer_email',
                         'status_order', 'status_payment'
                     ]
                 ])
@@ -204,8 +201,8 @@ describe('Transaction API', function () {
                     'success' => true,
                     'message' => 'Transaksi berhasil dibuat',
                     'data' => [
-                        'berat' => 2.5,
-                        'diskon' => 10,
+                        'kg' => 2.5,
+                        'discount' => 10,
                         'status_order' => 'Process',
                     ]
                 ]);
@@ -214,8 +211,8 @@ describe('Transaction API', function () {
         $this->assertDatabaseHas('transactions', [
             'customer_id' => $this->customerUser->id,
             'price_id' => $this->price->id,
-            'berat' => 2.5,
-            'diskon' => 10,
+            'kg' => 2.5,
+            'discount' => 10,
         ]);
     });
 
@@ -223,7 +220,7 @@ describe('Transaction API', function () {
         $transactionData = [
             'customer_id' => $this->customerUser->id,
             'price_id' => $this->price->id,
-            'berat' => 2.0,
+            'kg' => 2.0,
         ];
 
         $response = $this->withHeaders([
@@ -243,8 +240,8 @@ describe('Transaction API', function () {
         ])->postJson('/api/v1/transactions', [
             'customer_id' => 999999, // non-existent
             'price_id' => 999999,    // non-existent
-            'berat' => 0,            // below minimum
-            'diskon' => 150,         // above maximum
+            'kg' => 0,            // below minimum
+            'discount' => 150,         // above maximum
         ]);
 
         $response->assertStatus(422)
@@ -252,7 +249,7 @@ describe('Transaction API', function () {
                     'success' => false,
                     'message' => 'Data transaksi tidak valid',
                 ])
-                ->assertJsonValidationErrors(['customer_id', 'price_id', 'berat', 'diskon']);
+                ->assertJsonValidationErrors(['customer_id', 'price_id', 'kg', 'discount']);
     });
 
     test('create transaction with minimum order validation', function () {
@@ -262,11 +259,11 @@ describe('Transaction API', function () {
         ])->postJson('/api/v1/transactions', [
             'customer_id' => $this->customerUser->id,
             'price_id' => $this->price->id,
-            'berat' => 1.0, // 1 kg × 5000 = 5000 < 10000 minimum
+            'kg' => 1.0, // 1 kg × 5000 = 5000 < 10000 minimum
         ]);
 
         $response->assertStatus(422)
-                ->assertJsonPath('errors.berat.0', 'Minimum order Rp 10.000');
+                ->assertJsonPath('errors.kg.0', 'Minimum order Rp 10.000');
     });
 
     test('admin can update transaction status', function () {
