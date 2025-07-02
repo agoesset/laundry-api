@@ -106,7 +106,7 @@ class EmployeeController extends Controller
     public function showCustomer(Customer $customer)
     {
         // Check if customer belongs to authenticated user
-        if ($customer->user_id !== auth()->user()->id) {
+        if ($customer->user_id !== request()->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Customer not found'
@@ -129,7 +129,7 @@ class EmployeeController extends Controller
     public function updateCustomer(Request $request, Customer $customer)
     {
         // Check if customer belongs to authenticated user
-        if ($customer->user_id !== auth()->user()->id) {
+        if ($customer->user_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Customer not found'
@@ -158,7 +158,7 @@ class EmployeeController extends Controller
     public function destroyCustomer(Customer $customer)
     {
         // Check if customer belongs to authenticated user
-        if ($customer->user_id !== auth()->user()->id) {
+        if ($customer->user_id !== request()->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Customer not found'
@@ -306,7 +306,7 @@ class EmployeeController extends Controller
     public function showOrder(Order $order)
     {
         // Check if order belongs to authenticated user
-        if ($order->user_id !== auth()->user()->id) {
+        if ($order->user_id !== request()->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Order not found'
@@ -327,7 +327,7 @@ class EmployeeController extends Controller
     public function updateOrderStatus(Request $request, Order $order)
     {
         // Check if order belongs to authenticated user
-        if ($order->user_id !== auth()->user()->id) {
+        if ($order->user_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Order not found'
