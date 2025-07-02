@@ -252,7 +252,7 @@ class EmployeeController extends Controller
             'price_id' => 'required|exists:prices,id',
             'weight' => 'required|numeric|min:0.1',
             'discount' => 'nullable|numeric|min:0',
-            'payment_method' => 'required|in:cash,transfer,card',
+            'payment_method' => 'required|in:cash,transfer',
             'order_date' => 'nullable|date',
         ]);
 
